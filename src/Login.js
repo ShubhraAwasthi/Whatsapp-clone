@@ -3,11 +3,19 @@ import "./Login.css";
 import {Button} from "@material-ui/core";
 import {auth, provider} from "./firebase" ;
 import { useStateValue } from './StateProvider';
-import { actionTypes } from './Reducer';
+import { actionTypes , initialState} from './Reducer';
 import db from "./firebase";
 
 function Login() {
-
+    //useEffect((if())=>{},[auth.onAuthStateChanged])
+    /*function 
+     auth().onAuthStateChanged(function(user) {
+        if (user) {
+          alert("Signed in user!")
+        } else {
+          alert("No user!")
+        }
+      });*/
     const [{}, dispatch]=useStateValue();
 
     const signIn = () =>{
@@ -27,10 +35,6 @@ function Login() {
         
             })
             .catch((error) =>alert(error.message));
-
-            /**/ 
-            
-            /**/
             
     };
     return (

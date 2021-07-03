@@ -93,3 +93,8 @@
     padding: 10px;
     color: gray;
 }
+
+.chat_image {
+    height: 20vh;
+   display: block;
+}

@@ -67,9 +67,11 @@ function Sidebar() {
                     <IconButton onClick={() => {
                         auth.signOut();
                         db.collection('users').doc(user.uid).set({
-                            name: user.displayName,
+                            //name: user.displayName,
                             state: "offline",
                         })
+                        
+                        console.log(user);
                         }} >
                         <LogOut />
                     </IconButton>
