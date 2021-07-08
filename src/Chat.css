@@ -43,6 +43,7 @@
     position:relative;
     font-size: 16px;
     padding: 10px;
+    padding-bottom: 0;
     border-radius: 10px;
     width: fit-content;
     background-color: white;
@@ -97,4 +98,11 @@
 .chat_image {
     height: 20vh;
    display: block;
+}
+
+.like_button {
+    margin-right: 0;
+}
+.MuiTypography-body1 {
+    font-size: xx-small;
 }

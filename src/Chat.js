@@ -1,5 +1,5 @@
 import {Avatar, IconButton} from "@material-ui/core";
-import React,{useEffect, useState} from 'react';
+import React,{useEffect, useState, Component} from 'react';
 import "./Chat.css";
 import SearchOutlined from "@material-ui/icons/SearchOutlined";
 import AttachFile from "@material-ui/icons/AttachFile";
@@ -13,7 +13,11 @@ import firebase from "firebase";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import Compressor from 'compressorjs';
-
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Favorite from '@material-ui/icons/Favorite';
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
+  
 
 function Chat() {
 
@@ -26,6 +30,22 @@ function Chat() {
     const [emoji, setEmoji] = useState(false);
     const [src, setSRC] = useState('');
     const [image, setImage] = useState(null);
+    
+
+    const handleChange = (message, event) => {
+        //setLike(event.target.checked);
+        //console.log(event.target.checked);
+        //console.log(message.message);
+        if(event.target.checked)
+        message.likes=++message.likes;
+        else
+        message.likes=--message.likes;
+        //console.log(message.likes);
+        db.collection('rooms').doc(roomId).collection('messages').doc(message.id).update({
+            likes: message.likes,
+        })
+      };
+    
 
     //retrieving messages from firebase
     useEffect(() =>
@@ -35,10 +55,8 @@ function Chat() {
             onSnapshot( snapshot => (
                 setRoomName(snapshot.data().name)
             ));
-            console.log("fetching");
             db.collection('rooms').doc(roomId).collection('messages').orderBy('timestamp','asc').onSnapshot((snapshot) =>
             setMessages(snapshot.docs.map((doc) => doc.data())));
-            console.log("fetched");
         }
 
     },[roomId])
@@ -113,7 +131,14 @@ function Chat() {
             name:user.displayName,
             timestamp:firebase.firestore.FieldValue.serverTimestamp(),
             imagetype:false,
-        });
+            likes: 0,
+
+        }).then(message=>{console.log(message.id)
+        db.collection('rooms').doc(roomId).collection('messages').doc(message.id).update(
+            {
+            id: message.id,
+
+            })});
         
         setInput("");
     }
@@ -134,7 +159,7 @@ function Chat() {
       };
 
     return (
-        
+ 
         <div className="chat" >
             <div className="chat_header">
                 <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`}/>
@@ -167,10 +192,18 @@ function Chat() {
                         <span className="chat_name">{message.name}</span>
                         {message.message}
                         {message.imageUrl?<img src = {message.imageUrl} className= "chat_image" />: null}
+                        
                         <span className="chat_timestamp">
                             {new Date(message.timestamp?.toDate()).toUTCString()}
                         </span>
+                        <div className="like_button">
+                                <FormControlLabel control={<Checkbox onChange={(e) => handleChange(message, e)} icon={<FavoriteBorder fontSize="small" />} 
+                                checkedIcon={<Favorite fontSize="small"/>}
+                                name="checkedH" />}
+                                label={`${message.likes} Likes`}/>
+                        </div>
                     </p>
+                    
                 ))}
             </div>
             <div className="chat_footer">
@@ -189,6 +222,7 @@ function Chat() {
                 </IconButton>
             </div>
         </div>
+             
     )
 }
 
