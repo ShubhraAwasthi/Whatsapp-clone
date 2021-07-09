@@ -1,9 +1,8 @@
 .sidebar {
     display: flex;
     flex-direction: column;
-    flex:.35;
+     flex:.35; 
 }
-
 .sidebar_search {
     display: flex;
     align-items: center;
@@ -41,4 +40,14 @@
     flex:1;
     overflow: scroll;
     background-color: white;
+}
+
+.sidebar_nav {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.sidebar_nav>.MuiSvgIcon-root {
+    color: rgb(104, 103, 103);
+    padding: 10px;
 }

@@ -3,7 +3,7 @@ import {Avatar, IconButton} from "@material-ui/core";
 import DonutLargeIcon from "@material-ui/icons/DonutLarge";
 import ChatIcon from "@material-ui/icons/Chat";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import SearchOutlined from "@material-ui/icons/SearchOutlined";
+import {SearchOutlined, PeopleAlt, Home} from "@material-ui/icons";
 import SidebarChat  from './Sidebarchat';
 import './Sidebar.css';
 import db from "./firebase";
@@ -11,12 +11,31 @@ import { useStateValue } from './StateProvider';
 import {ExitToApp as LogOut} from "@material-ui/icons";
 import { Picker } from "emoji-mart";
 import {auth, provider} from "./firebase" ;
+import { NavLink, Route, useHistory, Switch } from 'react-router-dom';
 
 function Sidebar() {
     const [rooms, setRooms]=useState([]);
     const [{user},dispatch]= useStateValue();
     const [searchList, setSearchList] = useState(null);
     const [searchInput, setSearchInput] = useState("");
+    const [menu,setMenu]=useState(1);
+
+    const[users,setusers]= useState([]);
+
+    useEffect(() => {
+    const unsubscribe = db.collection('users').onSnapshot(snapshot => (
+        setusers(snapshot.docs.map(doc =>({
+            id: doc.id,
+            data: doc.data(),
+        })))
+        
+    ));
+    
+    return () => {
+        unsubscribe();
+    };
+    }, []);
+    console.log(users)
 
     useEffect(() => {
         const unsubscribe = db.collection('rooms').onSnapshot(snapshot => (
@@ -88,12 +107,54 @@ function Sidebar() {
                 </form>
             </div>
 
+
+            <div className="sidebar_nav">
+            <NavLink
+                    classSelected={menu === 1 ? true : false}
+                    to="/rooms"
+                    onClick={() => setMenu(1)}
+                    activeClassName="sidebar__menu--selected"
+                >
+                    <div className="sidebar__menu--rooms">
+                        <Home />
+                        <div className="sidebar__menu--line"></div>
+                    </div>
+                </NavLink>
+
+                <NavLink
+                    classSelected={menu === 2 ? true : false}
+                    to="/users"
+                    onClick={() => setMenu(2)}
+                    activeClassName="sidebar__menu--selected"
+                >
+                    <div className="sidebar__menu--users">
+                        <PeopleAlt />
+                        <div className="sidebar__menu--line"></div>
+                    </div>
+                </NavLink>
+            </div>
             <div className="sidebar_chats">
-                <SidebarChat addnewchat/>
+                {/* <SidebarChat addnewchat/>
                 {
                     rooms.map(room=>(
                         <SidebarChat key={room.id} id={room.id} name={room.data.name}/>
                     ))
+                } */}
+                <SidebarChat addnewchat/>
+                {console.log(menu)}
+                {menu === 1 ?
+                (
+                        rooms.map(room=>(
+                            <SidebarChat key={room.id} id={room.id} name={room.data.name} type="room"/>
+                        ))
+                )
+                    : 
+                (
+                    
+                        users.map(user=>(
+                            <SidebarChat key={user.id} id={user.id} name={user.data.name} photoURL={user.data.photoURL} type="user"/>
+                        ))
+                )
                 }
             </div>
         </div>

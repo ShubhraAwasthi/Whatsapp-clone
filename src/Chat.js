@@ -3,7 +3,6 @@ import React,{useEffect, useState, Component} from 'react';
 import "./Chat.css";
 import SearchOutlined from "@material-ui/icons/SearchOutlined";
 import AttachFile from "@material-ui/icons/AttachFile";
-import MoreVert from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from "@material-ui/icons/Mic";
 import {useParams} from "react-router-dom";
@@ -17,9 +16,10 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Favorite from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
-  
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import { BrowserRouter as Router, Switch, Route} from "react-router-dom";
 
-function Chat() {
+function Chat({type}) {
 
     const [input,setInput]=useState("");
     const [seed,setSeed]=useState('');
@@ -31,31 +31,52 @@ function Chat() {
     const [src, setSRC] = useState('');
     const [image, setImage] = useState(null);
     
-
+    //adding likes
     const handleChange = (message, event) => {
-        //setLike(event.target.checked);
-        //console.log(event.target.checked);
-        //console.log(message.message);
+        
         if(event.target.checked)
         message.likes=++message.likes;
         else
         message.likes=--message.likes;
-        //console.log(message.likes);
+        
+        if(type==="room")
         db.collection('rooms').doc(roomId).collection('messages').doc(message.id).update({
             likes: message.likes,
         })
-      };
-    
+       /* else
+        {
+            db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').doc(message.id).update({
+                likes: message.likes,
+            })
 
+            db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').doc(message.rid).update({
+                likes: message.likes,
+            })
+        }*/
+      };
+      /*const handleChange=(message,event)=>{
+
+      }
+    */
     //retrieving messages from firebase
     useEffect(() =>
     {
-        if(roomId) {
+        if(roomId && type==="room") {
             db.collection('rooms').doc(roomId).
             onSnapshot( snapshot => (
                 setRoomName(snapshot.data().name)
             ));
             db.collection('rooms').doc(roomId).collection('messages').orderBy('timestamp','asc').onSnapshot((snapshot) =>
+            setMessages(snapshot.docs.map((doc) => doc.data())));
+        }
+
+        else if(roomId && type==="user") {
+            db.collection('users').doc(roomId).
+            onSnapshot( snapshot => (
+                setRoomName(snapshot.data().name)
+            ));
+            
+            db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').orderBy('timestamp','asc').onSnapshot((snapshot) =>
             setMessages(snapshot.docs.map((doc) => doc.data())));
         }
 
@@ -92,7 +113,7 @@ function Chat() {
     
     useEffect(() =>
     {
-        if (image) 
+        if (image && type==="room") 
             {
             var split,imageName;
                 split = image.name.split(".");
@@ -114,7 +135,76 @@ function Chat() {
                             name:user.displayName,
                             timestamp:firebase.firestore.FieldValue.serverTimestamp(),
                             imagetype:true,
-                        })
+                            likes: 0,
+                        }).then(message=>{
+                            db.collection('rooms').doc(roomId).collection('messages').doc(message.id).update(
+                                {
+                                id: message.id,
+                    
+                                })});
+                            
+                        console.log("added to messages");
+                    }
+                })
+
+            }
+
+
+            if (image && type==="user") 
+            {
+            var split,imageName;
+                split = image.name.split(".");
+                imageName = split[0]+Math.floor(Math.random()*10000)+"." + split[1];
+                
+                    console.log("Image sending to compressor");
+                    new Compressor(image, { quality: 0.8, maxWidth: 1920, async success(result) 
+                    {
+                        console.log("Image sent to compressor");
+                        setSRC("");
+                        setImage(null);
+                        console.log("Image being sent to storage");
+                        await storage.child(imageName).put(result);
+                        const url = await storage.child(imageName).getDownloadURL();
+                        console.log("url extracted");
+                        //var sendermid, receivermid;
+                        db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').add(
+                        {
+                            imageUrl: url,
+                            name:user.displayName,
+                            timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+                            imagetype:true,
+                            likes: 0,
+                        }).then(message=>{//sendermid=message.id;
+                            db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').doc(message.id).update(
+                                {
+                                id: message.id,
+                    
+                                })});
+                            
+                        db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').add(
+                            {
+                                imageUrl: url,
+                                name:user.displayName,
+                                timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+                                imagetype:true,
+                                likes: 0,
+                            }).then(message=>{//receivermid=message.id;
+                                db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').doc(message.id).update(
+                                    {
+                                    id: message.id,
+                        
+                                    })});
+
+                       /* db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').doc(sendermid).update(
+                            {
+                            rid: receivermid,
+                
+                            });
+                        db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').doc(receivermid).update(
+                            {
+                            rid: sendermid,
+                
+                            });*/
                         console.log("added to messages");
                     }
                 })
@@ -125,7 +215,8 @@ function Chat() {
     //sending message
     const sendMessage = (e)=>{
         e.preventDefault();
-
+        if(type==="room")
+        {
         db.collection('rooms').doc(roomId).collection('messages').add({
             message:input,
             name:user.displayName,
@@ -139,7 +230,56 @@ function Chat() {
             id: message.id,
 
             })});
-        
+            setInput("");
+        }
+
+
+
+        else if(roomId && type==="user") 
+        {
+            let sendermid,receivermid;
+            db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').add({
+                message:input,
+                name:user.displayName,
+                timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+                imagetype:false,
+                likes: 0,
+    
+            }).then(message=>{
+                sendermid=message.id;
+            db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').doc(message.id).update(
+                {
+                id: message.id,
+    
+                })});
+
+            db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').add({
+                message:input,
+                name:user.displayName,
+                timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+                imagetype:false,
+                likes: 0,
+    
+            }).then(message=>{
+                receivermid=message.id;
+            db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').doc(message.id).update(
+                {
+                id: message.id,
+    
+                })});
+                console.log("message sent to both");
+                setInput("");
+           /* db.collection('users').doc(roomId).collection('messages').doc(user.uid).collection('chat').doc(sendermid).update(
+                {
+                rid: receivermid,
+    
+                });
+            db.collection('users').doc(user.uid).collection('messages').doc(roomId).collection('chat').doc(receivermid).update(
+                {
+                rid: sendermid,
+                });*/
+            
+        }
         setInput("");
     }
 
@@ -148,7 +288,6 @@ function Chat() {
     const addEmoji = (e) => {
         let emoji = e.native;
         setInput(input + emoji);
-        checkEmojiClose();
       };
 
       //closing emoji picker
@@ -157,6 +296,35 @@ function Chat() {
           setEmoji(false);
         }
       };
+
+      //deleting rooms
+      const deleteRoom = async () => {
+        if (window.navigator.onLine) {
+                try {
+                    const room = db.collection("rooms").doc(roomId);
+                    const fetchedMessages = await room.collection("messages").get();
+                    const fecthedImages = [];
+                    fetchedMessages.docs.forEach(doc => {
+                         if (doc.data().imagetype) {
+                            fecthedImages.push(doc.data().imageName);
+                        }
+                    });
+                    
+                    await Promise.all([
+                        ...fetchedMessages.docs.map(doc => doc.ref.delete()),
+                        ...fecthedImages.map(img => storage.child(img).delete()),
+                        room.delete(),
+                        roomId=null
+                    ]);
+                    //page.width <= 760 ? history.goBack() : history.replace("/chats");
+                } catch(e) {
+                    console.log(e.message);
+                   // page.width <= 760 ? history.goBack() : history.replace("/chats");
+                };
+            } else {
+                alert("No access to internet !!!");
+            };
+        };
 
     return (
  
@@ -180,7 +348,7 @@ function Chat() {
                     </label>
                 </IconButton>
                 <IconButton>
-                    <MoreVert/>
+                    <DeleteForeverIcon onClick={deleteRoom}/>
                 </IconButton>
             </div>
             </div>

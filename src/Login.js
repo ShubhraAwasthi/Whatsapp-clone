@@ -31,6 +31,8 @@ function Login() {
             db.collection('users').doc(result.user.uid).set({
                 name:result.user.displayName,
                 state: "online",
+                Status: "Hey there!!",
+                photoURL: result.user.photoURL
             });
         
             })
