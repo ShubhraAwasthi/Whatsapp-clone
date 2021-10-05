@@ -1,4 +1,4 @@
-//Declares some states globally so we dont have to pass thm from highest generation to lowest through props again and again
+//Declares some states globally so that we dont have to pass them from highest generation to lowest generation through props again and again
 import React, {createContext, useContext, useReducer} from 'react';
 
 export const StateContext = createContext();
