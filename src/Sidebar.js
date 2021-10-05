@@ -13,6 +13,8 @@ import { Picker } from "emoji-mart";
 import {auth, provider} from "./firebase" ;
 import { NavLink, Route, useHistory, Switch } from 'react-router-dom';
 
+// declaring sidebar function
+
 function Sidebar() {
     const [rooms, setRooms]=useState([]);
     const [{user},dispatch]= useStateValue();
