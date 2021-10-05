@@ -1,3 +1,11 @@
+# Whatsapp Clone
+
+## FEATURES
+- Google Authentication
+- Creating and Deleting rooms
+- 1-1 Messaging
+- Sharing Text, Images & Emoticons
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
