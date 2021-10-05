@@ -18,7 +18,7 @@
     border-radius: 10px;
 }
 .sidebar_search_container>.MuiSvgIcon-root {
-    color: gray;
+    color: rgb(126, 126, 126);
     padding: 10px;
 }
 .sidebar_search_container>input {
@@ -39,7 +39,7 @@
 .sidebar_chats {
     flex:1;
     overflow: scroll;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
 }
 
 .sidebar_nav {

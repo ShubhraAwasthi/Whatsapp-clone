@@ -6,6 +6,8 @@ import { useStateValue } from './StateProvider';
 import { actionTypes , initialState} from './Reducer';
 import db from "./firebase";
 
+//declaring login function
+
 function Login() {
     //useEffect((if())=>{},[auth.onAuthStateChanged])
     /*function 
