@@ -82,13 +82,13 @@ function Chat({type}) {
 
     },[roomId])
 
-    //profile pictures
+    //for profile pictures
     useEffect(() => {
         setSeed(Math.floor(Math.random()*500));
         
     }, [])
 
-    //handling image input
+    //for handling image output
     const handleFile = event => {
         console.log("Image detected");
         if (window.navigator.onLine) {
@@ -109,7 +109,7 @@ function Chat({type}) {
         };
     };
 
-    //sending image
+    //for sending image
     
     useEffect(() =>
     {

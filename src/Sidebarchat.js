@@ -4,7 +4,7 @@ import {Avatar, IconButton} from "@material-ui/core";
 import db from "./firebase";
 import {Link} from "react-router-dom";
 
-//declaring sidebarchat function
+//declared the sidebarchat function
 
 function Sidebarchat({id, name, addnewchat,type, photoURL}) {
     const [seed,setSeed]=useState('');
