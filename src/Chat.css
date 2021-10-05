@@ -8,7 +8,7 @@
     padding: 20px;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid rgb(207, 204, 204);
 }
 
 .chat_header_info {
@@ -22,7 +22,7 @@
 }
 
 .chat_header_info>p {
-    color: gray;
+    color: rgb(126, 125, 125);
 }
 
 .chat_header_right {
@@ -41,7 +41,7 @@
 }
 .chat_message {
     position:relative;
-    font-size: 16px;
+    font-size: 17px;
     padding: 10px;
     padding-bottom: 0;
     border-radius: 10px;
@@ -70,7 +70,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 62px;
+    height: 63px;
     border-top: 1px solid lightgray;
 }
 
